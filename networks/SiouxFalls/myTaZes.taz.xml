@@ -1,0 +1,26 @@
+<tazs>
+    <taz id="1" edges="#EdgeID1 #EdgeID2"/>
+    <taz id="2" edges="#EdgeID3 #EdgeID4"/>
+    <taz id="3" edges="#EdgeID5 #EdgeID6 #EdgeID7"/>
+    <taz id="4" edges="#EdgeID8 #EdgeID9 #EdgeID10"/>
+    <taz id="5" edges="#EdgeID11 #EdgeID12 #EdgeID13"/>
+    <taz id="6" edges="#EdgeID14 #EdgeID15 #EdgeID16"/>
+    <taz id="7" edges="#EdgeID17 #EdgeID18"/>
+    <taz id="8" edges="#EdgeID19 #EdgeID20 #EdgeID21 #EdgeID22"/>
+    <taz id="9" edges="#EdgeID23 #EdgeID24 #EdgeID25"/>
+    <taz id="10" edges="#EdgeID26 #EdgeID27 #EdgeID28 #EdgeID29 #EdgeID30"/>
+    <taz id="11" edges="#EdgeID31 #EdgeID32 #EdgeID33 #EdgeID34"/>
+    <taz id="12" edges="#EdgeID35 #EdgeID36 #EdgeID37"/>
+    <taz id="13" edges="#EdgeID38 #EdgeID39"/>
+    <taz id="14" edges="#EdgeID40 #EdgeID41 #EdgeID42"/>
+    <taz id="15" edges="#EdgeID43 #EdgeID44 #EdgeID45 #EdgeID46"/>
+    <taz id="16" edges="#EdgeID47 #EdgeID48 #EdgeID49 #EdgeID50"/>
+    <taz id="17" edges="#EdgeID51 #EdgeID52 #EdgeID53"/>
+    <taz id="18" edges="#EdgeID54 #EdgeID55 #EdgeID56"/>
+    <taz id="19" edges="#EdgeID57 #EdgeID58 #EdgeID59"/>
+    <taz id="20" edges="#EdgeID60 #EdgeID61 #EdgeID62 #EdgeID63"/>
+    <taz id="21" edges="#EdgeID64 #EdgeID65 #EdgeID66"/>
+    <taz id="22" edges="#EdgeID67 #EdgeID68 #EdgeID69 #EdgeID70"/>
+    <taz id="23" edges="#EdgeID71 #EdgeID72 #EdgeID73"/>
+    <taz id="24" edges="#EdgeID74 #EdgeID75 #EdgeID76"/>
+</tazs>

@@ -1,0 +1,11 @@
+<configuration>
+	<input>
+		<net-file value="upd_MESO_SiouxFalls.net.xml"/>
+		<route-files value="test_upd_ODTrips.trips.xml"/>
+		<additional-files value='detectors.add.xml'/>
+	</input>
+	<time>
+		<begin value="28000"/>
+		<end value="34000"/>
+	</time>
+</configuration>

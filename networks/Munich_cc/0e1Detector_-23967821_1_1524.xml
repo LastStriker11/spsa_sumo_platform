@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 11/21/21 17:41:32 by Eclipse SUMO sumo Version 1.8.0
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
+
+    <input>
+        <net-file value="../Network/Munich_cc/Munich_cc.net.xml"/>
+        <route-files value="../temp/0upd_ODTrips.trips.xml"/>
+        <additional-files value="../Network/Munich_cc/detectors.add.xml"/>
+    </input>
+
+    <output>
+        <output-prefix value="0"/>
+        <vehroute-output value="../temp/Munich.vehroutes.xml"/>
+    </output>
+
+    <time>
+        <begin value="28800"/>
+        <end value="32900"/>
+    </time>
+
+    <processing>
+        <pedestrian.model value="nonInteracting"/>
+    </processing>
+
+    <routing>
+        <device.rerouting.probability value="0.1"/>
+    </routing>
+
+    <report>
+        <xml-validation value="never"/>
+        <xml-validation.routes value="never"/>
+        <no-step-log value="true"/>
+    </report>
+
+    <mesoscopic>
+        <mesosim value="true"/>
+    </mesoscopic>
+
+    <random_number>
+        <seed value="-9731"/>
+    </random_number>
+
+</configuration>
+-->
+
+<detector xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/det_e1meso_file.xsd">
+    <interval begin="28800.00" end="29700.00" id="e1Detector_-23967821_1_1524" sampledSeconds="842.62" density="12.66" laneDensity="6.33" occupancy="3.16" waitingTime="0.00" timeLoss="22.83" speed="13.30" departed="0" arrived="0" entered="152" left="151"/>
+    <interval begin="29700.00" end="30600.00" id="e1Detector_-23967821_1_1524" sampledSeconds="944.99" density="14.20" laneDensity="7.10" occupancy="3.55" waitingTime="0.00" timeLoss="28.15" speed="13.26" departed="0" arrived="0" entered="170" left="168"/>
+    <interval begin="30600.00" end="31500.00" id="e1Detector_-23967821_1_1524" sampledSeconds="989.83" density="14.87" laneDensity="7.44" occupancy="3.72" waitingTime="0.00" timeLoss="32.74" speed="13.23" departed="0" arrived="0" entered="176" left="179"/>
+    <interval begin="31500.00" end="32400.00" id="e1Detector_-23967821_1_1524" sampledSeconds="829.66" density="12.46" laneDensity="6.23" occupancy="3.12" waitingTime="0.00" timeLoss="20.35" speed="13.28" departed="0" arrived="0" entered="149" left="149"/>
+    <interval begin="32400.00" end="32900.00" id="e1Detector_-23967821_1_1524" sampledSeconds="74.11" density="2.00" laneDensity="1.00" occupancy="0.50" waitingTime="0.00" timeLoss="0.00" speed="12.97" departed="0" arrived="0" entered="13" left="13"/>
+</detector>

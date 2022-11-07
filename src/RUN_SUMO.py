@@ -5,7 +5,7 @@ import os
 from src.miscs import parse_loop_data
 #%%
 def write_od(config, sim_setup, od_demand):
-    head_text = (f"$OR;D2 \n* From-Time  To-Time \n{sim_setup['starttime']} {sim_setup['endtime']}\n* Factor \n1.00\n")
+    head_text = (f"$OR;D2 \n* From-Time  To-Time \n{sim_setup['starttime']}.00 {sim_setup['endtime']}.00\n* Factor \n1.00\n")
     file_name = config["CACHE"] / "od_updated.txt"
     file = open(file_name, "w")
     file.write(head_text)
@@ -18,10 +18,11 @@ def RSUMOStateInPar(config, sim_setup, k, seed):
     od2trips_cmd = (
         f"od2trips --no-step-log --output-prefix {k} --spread.uniform "
         f"--taz-files {config['NETWORK']/sim_setup['taz']} "
-        f"-d {config['NETWORK']}\\od_updated.txt "
+        f"-d {config['CACHE']}\\od_updated.txt "
         f"-o {config['CACHE']}\\upd_od_trips.trips.xml --seed {seed}"
         )
     subprocess.run(od2trips_cmd)
+    print(od2trips_cmd)
     
     # Run SUMO to generate outputs
     sumo_run = (
@@ -33,6 +34,7 @@ def RSUMOStateInPar(config, sim_setup, k, seed):
         f"--additional-files {config['NETWORK']/sim_setup['detector']} "
         f"--xml-validation never --device.rerouting.probability {p_reroute} --seed {seed}"
         )
+    print(sumo_run)
     subprocess.run(sumo_run)
 #%% Aggregate the outputs
 def CallSUMOGetCounts(config, sim_setup, od_demand):
@@ -65,11 +67,9 @@ def CallSUMOGetCounts(config, sim_setup, od_demand):
         # counts
         elif sim_setup["objective"] == "counts":
             loop_file = (str(counter) + "out.xml")
-            df_loop = parse_loop_data(config["SUMO"], 
-                                      config["NETWORK"],
+            df_loop = parse_loop_data(config, 
                                       loop_file,
-                                      sim_setup["endtime"],
-                                      config["OS"])
+                                      sim_setup["endtime"])
             df_loop = pd.DataFrame(df_loop)
             df_loop.columns = ["label", "counts", "speeds", "density"]
             df_loop = df_loop.set_index("label")

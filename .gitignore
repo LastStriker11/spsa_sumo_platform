@@ -1,5 +1,8 @@
 # ignore all cache
 cache/
 
+# exclude networks
+networks/
+
 # python cache
 */__pycache__/

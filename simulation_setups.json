@@ -4,8 +4,8 @@
     "taz": "tazes.taz.xml",
     "detector": "detectors.add.xml",
     "prior_od": "start_od.txt",
-    "starttime": 7,
-    "endtime": 8,
+    "starttime": 8,
+    "endtime": 9,
     "n_sumo_replicate": 1,
     "loop_data": "true_data.csv",
 	"tt_data": "true_tt.csv"

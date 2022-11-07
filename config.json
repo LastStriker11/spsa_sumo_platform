@@ -1,5 +1,5 @@
 {
-    "NETWORK": "networks/synthetic_small",
+    "NETWORK": "networks/SiouxFalls",
     "CACHE": "cache",
     "SUMO": "D:/Sumo"
 }

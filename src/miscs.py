@@ -53,7 +53,7 @@ def Vector2Full(allODArray):
     return FullOD
 
 
-def parse_loop_data(pathToSUMOtools, pathtoCaseOutput, loop_file, endtime):
+def parse_loop_data(config, loop_file, endtime):
     """Read the Loop Detectors Data: Each SUMO run produces a file with the
     traffic counts. This function reads the corresponding traffic counts file
     and converts the readings to traffic counts usable in Matlab. The process
@@ -70,8 +70,6 @@ def parse_loop_data(pathToSUMOtools, pathtoCaseOutput, loop_file, endtime):
         DESCRIPTION.
     endtime : TYPE
         DESCRIPTION.
-    OS : TYPE
-        DESCRIPTION.
 
     Returns
     -------
@@ -85,18 +83,20 @@ def parse_loop_data(pathToSUMOtools, pathtoCaseOutput, loop_file, endtime):
     fract=round(fract-integ, 2)
     endSimTime=integ*60*60 + fract*60
         
-    Loopdata_csv=(r''+ pathtoCaseOutput + '/' 'loopDataName.csv')
-
-    Data2csv = (r'python ' '"' + pathToSUMOtools + 'tools/xml/xml2csv.py' '"'\
-                ' ' '"' + pathtoCaseOutput + loop_file + '"' ' --x '\
-                '"' + pathToSUMOtools + 'data/xsd/det_e1meso_file.xsd' '"'+ ' -o '\
-                '"' + Loopdata_csv + '"')
-    subprocess.run(Data2csv)
+    output_file =(config["NETWORK"] / "loopDataName.csv")
+    data2csv = (
+        f"python {config['SUMO']}\\tools\\xml\\xml2csv.py "
+        f"{config['NETWORK']/loop_file} "
+        f"--x {config['SUMO']}\\data\\xsd\\det_e1meso_file.xsd "
+        f"-o {output_file}"
+        )
+        
+    subprocess.run(data2csv)
 
     # Then we read the data from this run (taking into account the proper time
     # interval).
     
-    simulated_tripsInTable= pd.read_csv(Loopdata_csv, sep=";", header=0)
+    simulated_tripsInTable= pd.read_csv(output_file, sep=";", header=0)
     simulated_tripsInTable = simulated_tripsInTable[simulated_tripsInTable['interval_end'] \
                                                     < endSimTime]
 

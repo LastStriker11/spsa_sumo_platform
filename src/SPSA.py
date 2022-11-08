@@ -2,7 +2,7 @@ import numpy as np
 import pickle
 import pandas as pd
 from src.RUN_SUMO import CallSUMOGetCounts
-from src.miscs import Vector2Full
+from src.miscs import vector2matrix
 #%%  # Goodness-of-fit function (RMSN)
 def gof_eval(df_true, df_simulated):
     data = pd.DataFrame()
@@ -27,7 +27,7 @@ def SPSA(config, sim_setup, spsa_setup, df_true, input_od):
     seg = spsa_setup["seg"]
     
     #%%
-    ODbase = Vector2Full(input_od.iloc[:,2]) # to restore OD after perturbations
+    ODbase = vector2matrix(input_od.iloc[:,2]) # to restore OD after perturbations
     OD = ODbase.copy()
     
     print('Simulation 0 started')

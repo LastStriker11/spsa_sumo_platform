@@ -5,6 +5,18 @@ import os
 from src.miscs import parse_loop_data
 #%%
 def write_od(config, sim_setup, od_demand):
+    """Write the current OD to a text file based specific format.
+
+    Parameters
+    ----------
+    od_demand : Pandas Dataframe
+        Current demand.
+
+    Returns
+    -------
+    None.
+
+    """
     head_text = (f"$OR;D2 \n* From-Time  To-Time \n{sim_setup['starttime']}.00 {sim_setup['endtime']}.00\n* Factor \n1.00\n")
     file_name = config["CACHE"] / "od_updated.txt"
     file = open(file_name, "w")
@@ -12,7 +24,22 @@ def write_od(config, sim_setup, od_demand):
     file.close()
     od_demand.to_csv(file_name, header=False, index=False, sep=" ", mode="a")
 #%%
-def RSUMOStateInPar(config, sim_setup, k, seed):
+def run_sumo(config, sim_setup, k, seed):
+    """Run OD2Trips and SUMO simulation.
+    
+
+    Parameters
+    ----------
+    k : Int
+        SUMO replication index.
+    seed : Int
+        Random seed.
+
+    Returns
+    -------
+    None.
+
+    """
     p_reroute = 0.1 # rerouting probability
     # Run od2trips_cmd to generate trips file
     od2trips_cmd = (
@@ -22,7 +49,6 @@ def RSUMOStateInPar(config, sim_setup, k, seed):
         f"-o {config['CACHE']}\\upd_od_trips.trips.xml --seed {seed}"
         )
     subprocess.run(od2trips_cmd)
-    print(od2trips_cmd)
     
     # Run SUMO to generate outputs
     sumo_run = (
@@ -34,10 +60,12 @@ def RSUMOStateInPar(config, sim_setup, k, seed):
         f"--additional-files {config['NETWORK']/sim_setup['detector']} "
         f"--xml-validation never --device.rerouting.probability {p_reroute} --seed {seed}"
         )
-    print(sumo_run)
     subprocess.run(sumo_run)
 #%% Aggregate the outputs
-def CallSUMOGetCounts(config, sim_setup, od_demand):
+def parse_sumo_outputs(config, sim_setup, od_demand):
+    """Read and parse SUMO outputs.
+    
+    """
     write_od(config, sim_setup, od_demand)
     
     np.random.seed(11)
@@ -48,7 +76,7 @@ def CallSUMOGetCounts(config, sim_setup, od_demand):
     time = pd.DataFrame()
     for counter in range(sim_setup["n_sumo_replicate"]):
         # Run simulation
-        RSUMOStateInPar(config, sim_setup, counter, random_seeds[counter])
+        run_sumo(config, sim_setup, counter, random_seeds[counter])
         
         # travel times      
         if sim_setup["objective"] == "travel_times":
@@ -66,7 +94,7 @@ def CallSUMOGetCounts(config, sim_setup, od_demand):
         
         # counts
         elif sim_setup["objective"] == "counts":
-            loop_file = (str(counter) + "out.xml")
+            loop_file = str(counter) + "out.xml"
             df_loop = parse_loop_data(config, 
                                       loop_file,
                                       sim_setup["endtime"])

@@ -8,6 +8,25 @@ from pathlib import Path
 def load_experiment_config(config: Union[Path, str]="config.json",
                            sim_setup: Union[Path, str]="simulation_setups.json",
                            spsa_setup: Union[Path, str]="spsa_setups.json"):
+    """Load paths, simulation setups and algorithm setups
+    
+
+    Parameters
+    ----------
+    config : Union[Path, str], optional
+        Paths to cache, network, and SUMO. The default is "config.json".
+    sim_setup : Union[Path, str], optional
+        Simulation parameters. The default is "simulation_setups.json".
+    spsa_setup : Union[Path, str], optional
+        SPSA parameters. The default is "spsa_setups.json".
+
+    Returns
+    -------
+    config : Dictionary
+    sim_setup : Dictionary
+    spsa_setup : Dictionary
+
+    """
     config = Path(config) if isinstance(config, str) else config
     config = json.load(open(config))
     for k, v in config.items():
@@ -28,29 +47,28 @@ def load_experiment_config(config: Union[Path, str]="config.json",
 config, sim_setup, spsa_setup = load_experiment_config()
     
 
-def Vector2Full(allODArray):
+def vector2matrix(od_vector):
     """A simple function that converts an OD vector to OD matrix. We read
     through the vector (row after row) and create a matrix.
 
     Parameters
     ----------
-    allODArray : TYPE
-        DESCRIPTION.
+    od_vector : Pandas DataFrame
 
     Returns
     -------
-    FullOD : TYPE
-        DESCRIPTION.
+    od_matrix : Numpy array
+        Two-dimensional numpy array.
 
     """
-    nZones = int(np.sqrt(allODArray.shape[0]))
-    FullOD = np.zeros((nZones,nZones))
+    n_zones = int(np.sqrt(od_vector.shape[0]))
+    od_matrix = np.zeros((n_zones, n_zones))
     m = 0
-    for i in range(0, nZones):
-        for j in range(0, nZones):
-            FullOD[i,j]= allODArray[m];
-            m=m+1;
-    return FullOD
+    for i in range(0, n_zones):
+        for j in range(0, n_zones):
+            od_matrix[i,j]= od_vector[m];
+            m = m + 1;
+    return od_matrix
 
 
 def parse_loop_data(config, loop_file, endtime):
@@ -62,26 +80,24 @@ def parse_loop_data(config, loop_file, endtime):
 
     Parameters
     ----------
-    pathToSUMOtools : TYPE
-        DESCRIPTION.
-    pathtoCaseOutput : TYPE
-        DESCRIPTION.
-    loopDataName : TYPE
-        DESCRIPTION.
-    endtime : TYPE
-        DESCRIPTION.
+    config : Dictionary
+        Necessary paths.
+    loop_file : String
+        SUMO detector data file.
+    endtime : Float/Int
+        End time of the current interval.
 
     Returns
     -------
-    AllPeriodEdgesFlows : TYPE
-        DESCRIPTION.
+    df_all : Pandas Dataframe
+        All loop data.
 
     """
     # We first do some time manipulations necessary.
-    fract=float(endtime)
-    integ=int(fract)
-    fract=round(fract-integ, 2)
-    endSimTime=integ*60*60 + fract*60
+    fract = float(endtime)
+    integ = int(fract)
+    fract = round(fract-integ, 2)
+    endSimTime = integ*60*60 + fract*60
         
     output_file =(config["NETWORK"] / "loopDataName.csv")
     data2csv = (
@@ -96,66 +112,31 @@ def parse_loop_data(config, loop_file, endtime):
     # Then we read the data from this run (taking into account the proper time
     # interval).
     
-    simulated_tripsInTable= pd.read_csv(output_file, sep=";", header=0)
-    simulated_tripsInTable = simulated_tripsInTable[simulated_tripsInTable['interval_end'] \
-                                                    < endSimTime]
+    df_trips = pd.read_csv(output_file, sep=";", header=0)
+    df_trips = df_trips[df_trips["interval_end"] < endSimTime]
 
     # The final step is to aggregate the counts per link (so that we do can
     # estimate per link flow and not per lane). 
-    Detector_ID=simulated_tripsInTable['interval_id']
-    myEdges = [word.split('_')[1] for word in Detector_ID]
-    simulated_tripsInTable['EdgeID'] = myEdges
+    det_id = df_trips["interval_id"]
+    edge_id = [word.split("_")[1] for word in det_id]
+    df_trips["EdgeID"] = edge_id
     
     temp = pd.DataFrame()
-    temp['EdgeID'] = myEdges
-    temp['Counts'] = simulated_tripsInTable['interval_entered']
-    temp['Speeds'] = simulated_tripsInTable['interval_speed']
-    temp['Density'] = simulated_tripsInTable['interval_density']
-    temp=temp.fillna(0)
-    Grouped = temp.groupby('EdgeID').agg(np.sum)
-    Grouped2 = temp.groupby('EdgeID').agg(np.average)
-    Grouped['Edge'] = Grouped.index
-    Grouped2['Edge'] = Grouped.index
-    AllPeriodEdgesFlows = pd.DataFrame()
-    AllPeriodEdgesFlows['Counts'] = Grouped['Counts']
-    AllPeriodEdgesFlows['Speeds'] = Grouped2['Speeds']
-    AllPeriodEdgesFlows['Density'] = Grouped2['Density']
-    AllPeriodEdgesFlows = AllPeriodEdgesFlows.reset_index()
-    AllPeriodEdgesFlows = AllPeriodEdgesFlows.values
-    del temp, Grouped
-    return AllPeriodEdgesFlows
+    temp["EdgeID"] = edge_id
+    temp["Counts"] = df_trips["interval_entered"]
+    temp["Speeds"] = df_trips["interval_speed"]
+    temp["Density"] = df_trips["interval_density"]
+    temp = temp.fillna(0)
+    df_group = temp.groupby("EdgeID").agg(np.sum)
+    df_group2 = temp.groupby("EdgeID").agg(np.average)
+    df_group["Edge"] = df_group.index
+    df_group2["Edge"] = df_group.index
+    df_all = pd.DataFrame()
+    df_all["Counts"] = df_group["Counts"]
+    df_all["Speeds"] = df_group2["Speeds"]
+    df_all["Density"] = df_group2["Density"]
+    df_all = df_all.reset_index()
+    df_all = df_all.values
+    del temp, df_group
+    return df_all
     
-def gof_eval(truedata, simulatedCounts):
-    """This function provides some measures of Goodness of Fit.
-    
-
-    Parameters
-    ----------
-    truedata : TYPE
-        DESCRIPTION.
-    simulatedCounts : TYPE
-        DESCRIPTION.
-
-    Returns
-    -------
-    TYPE
-        DESCRIPTION.
-    counts : TYPE
-        DESCRIPTION.
-
-    """
-    truedata = truedata.reshape(len(truedata), 1)
-    simulatedCounts = simulatedCounts.reshape(len(simulatedCounts),1)
-    kk=truedata.shape
-    RMSNE=[]
-    for i in range(0, kk[1]):
-        RMSNE.append(0)
-        for j in range(0, kk[0]):
-            if truedata[j,i]>0:
-                RMSNE[i]=RMSNE[i]+((simulatedCounts[j,i]-truedata[j,i])/truedata[j,i])**2
-            elif simulatedCounts[j,i]>0:
-                RMSNE[i]=RMSNE[i]+1
-        RMSNE[i]=np.sqrt(RMSNE[i]/kk[0])
-    y = RMSNE    
-    return y #, counts
-

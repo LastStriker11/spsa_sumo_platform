@@ -2,7 +2,6 @@ import os
 os.chdir("../")
 
 import pandas as pd
-import os
 from src.RUN_SUMO import parse_sumo_outputs
 from src.miscs import config, sim_setup
 

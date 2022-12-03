@@ -1,17 +1,8 @@
 import numpy as np
 import pickle
 import pandas as pd
-from src.RUN_SUMO import CallSUMOGetCounts
-from src.miscs import vector2matrix
-#%%  # Goodness-of-fit function (RMSN)
-def gof_eval(df_true, df_simulated):
-    data = pd.DataFrame()
-    data['diff_square'] = (df_simulated['simulated_counts'] - df_true['true_counts'])**2
-    n = data.shape[0]
-    sum_diff = data['diff_square'].sum()
-    sum_true = df_true['true_counts'].sum()
-    RMSN = np.sqrt(n*sum_diff)/sum_true
-    return RMSN
+from src.RUN_SUMO import parse_sumo_outputs
+from src.miscs import vector2matrix, gof_eval
 #%% Simultaneous Perturbation Stochastic Approximation
 def SPSA(config, sim_setup, spsa_setup, df_true, input_od):
 
@@ -30,19 +21,19 @@ def SPSA(config, sim_setup, spsa_setup, df_true, input_od):
     ODbase = vector2matrix(input_od.iloc[:,2]) # to restore OD after perturbations
     OD = ODbase.copy()
     
-    print('Simulation 0 started')
-    df_simulated = CallSUMOGetCounts(config, sim_setup, input_od)
+    print("Simulation 0 started")
+    df_simulated = parse_sumo_outputs(config, sim_setup, input_od)
     df_true=df_true.fillna(0)
-    print('Simulation 0 completed')
+    print("Simulation 0 completed")
     y = gof_eval(df_true, df_simulated)
     rmsn = []
     rmsn.append(y)
-    print('Starting RMSN = ', y)
-    print('========================================')
+    print("Starting RMSN = ", y)
+    print("========================================")
     Best_OD = input_od.iloc[:,2]
     Best_RMSN = 100
-    Best_simulatedCounts = df_simulated['simulated_counts']
-#    allODVectors = np.zeros((len(OD), N))
+    Best_simulatedCounts = df_simulated["simulated_counts"]
+
     OD_plus = input_od.copy()
     OD_minus = input_od.copy()
     OD_min = input_od.copy()
@@ -76,9 +67,9 @@ def SPSA(config, sim_setup, spsa_setup, df_true, input_od):
                                     
             del p, q
             
-            OD_plus.iloc[:,2] = pd.DataFrame(OD).stack().values#!!
-            print('Simulation %d . %d . plus perturbation' %(iteration, ga))
-            df_simulated = CallSUMOGetCounts(config, sim_setup, input_od)
+            OD_plus.iloc[:,2] = pd.DataFrame(OD).stack().values
+            print("Simulation %d . %d . plus perturbation" %(iteration, ga))
+            df_simulated = parse_sumo_outputs(config, sim_setup, OD_plus)
             y = gof_eval(df_true, df_simulated)
             yplus=np.asarray(y)
             
@@ -96,9 +87,9 @@ def SPSA(config, sim_setup, spsa_setup, df_true, input_od):
                                     OD[e, f] = OD[e, f] - (ck * delta[e*OD.shape[0]+f]) * q / m
             del p, q
             
-            OD_minus.iloc[:,2] = pd.DataFrame(OD).stack().values#!!
-            print('Simulation %d . %d . minus perturbation' %(iteration, ga))
-            df_simulated = CallSUMOGetCounts(config, sim_setup, input_od)
+            OD_minus.iloc[:,2] = pd.DataFrame(OD).stack().values
+            print("Simulation %d . %d . minus perturbation" %(iteration, ga))
+            df_simulated = parse_sumo_outputs(config, sim_setup, OD_minus)
             y = gof_eval(df_true, df_simulated)
             yminus=np.asarray(y)
             
@@ -126,24 +117,24 @@ def SPSA(config, sim_setup, spsa_setup, df_true, input_od):
                             if diff > 0.15:
                                 OD[e, f] = ODbase[e, f] * 1.15
         ODbase = OD.copy()
-        OD_min.iloc[:,2] = pd.DataFrame(OD).stack().values#!!
+        OD_min.iloc[:,2] = pd.DataFrame(OD).stack().values
         
-        print('Simulation %d . %d . minimization' %(iteration, ga))
-        df_simulated = CallSUMOGetCounts(config, sim_setup, input_od)
+        print("Simulation %d . %d . minimization" %(iteration, ga))
+        df_simulated = parse_sumo_outputs(config, sim_setup, OD_min)
         y_min = gof_eval(df_true, df_simulated)
 
         rmsn.append(y_min)
         
-        print('Iteration NO. %d done' % iteration)
-        print('RMSN = ', y_min)
-        print('Iterations remaining = %d' % (N-iteration))
-        print('========================================')
+        print("Iteration NO. %d done" % iteration)
+        print("RMSN = ", y_min)
+        print("Iterations remaining = %d" % (N-iteration))
+        print("========================================")
         if y_min < Best_RMSN:
             Best_OD = OD_min.iloc[:,2]
             Best_RMSN = y_min
-            Best_simulatedCounts = df_simulated['simulated_counts']
+            Best_simulatedCounts = df_simulated["simulated_counts"]
 
-    f = open('counts_SPSA.pckl', 'wb') # for counts
+    f = open("counts_SPSA.pckl", "wb") # for counts
 
     pickle.dump([Best_RMSN, Best_OD, Best_simulatedCounts, rmsn, list_ak, list_ck, list_g], f)
     f.close()

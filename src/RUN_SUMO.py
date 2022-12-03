@@ -111,7 +111,7 @@ def parse_sumo_outputs(config, sim_setup, od_demand):
         return df_tt_mean
     elif sim_setup["objective"] == "counts":
         df_counts_mean = counts.astype("int32")
-        df_counts_mean = pd.DataFrame(columns = ["label","simulated_counts","simulated_speeds","simulated_density"])
+        df_counts_mean = pd.DataFrame(columns = ["simulated_counts","simulated_speeds","simulated_density"])
         df_counts_mean["simulated_counts"]= counts.mean(axis=1)
         df_counts_mean["simulated_speeds"]= speeds.mean(axis=1)
         df_counts_mean["simulated_density"]= density.mean(axis=1)

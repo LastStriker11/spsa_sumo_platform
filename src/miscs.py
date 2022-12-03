@@ -5,6 +5,16 @@ import subprocess
 from typing import Union
 from pathlib import Path
 
+
+def gof_eval(df_true, df_simulated):
+    data = pd.DataFrame()
+    data['diff_square'] = (df_simulated['simulated_counts'] - df_true['true_counts'])**2
+    n = data.shape[0]
+    sum_diff = data['diff_square'].sum()
+    sum_true = df_true['true_counts'].sum()
+    RMSN = np.sqrt(n*sum_diff)/sum_true
+    return RMSN
+
 def load_experiment_config(config: Union[Path, str]="config.json",
                            sim_setup: Union[Path, str]="simulation_setups.json",
                            spsa_setup: Union[Path, str]="spsa_setups.json"):

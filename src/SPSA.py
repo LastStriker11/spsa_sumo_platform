@@ -23,7 +23,7 @@ def SPSA(config, sim_setup, spsa_setup, df_true, input_od):
     
     print("Simulation 0 started")
     df_simulated = parse_sumo_outputs(config, sim_setup, input_od)
-    df_true=df_true.fillna(0)
+    df_true = df_true.fillna(0)
     print("Simulation 0 completed")
     y = gof_eval(df_true, df_simulated)
     rmsn = []
@@ -71,7 +71,7 @@ def SPSA(config, sim_setup, spsa_setup, df_true, input_od):
             print("Simulation %d . %d . plus perturbation" %(iteration, ga))
             df_simulated = parse_sumo_outputs(config, sim_setup, OD_plus)
             y = gof_eval(df_true, df_simulated)
-            yplus=np.asarray(y)
+            yplus = np.asarray(y)
             
             OD = ODbase.copy()
 
@@ -91,7 +91,7 @@ def SPSA(config, sim_setup, spsa_setup, df_true, input_od):
             print("Simulation %d . %d . minus perturbation" %(iteration, ga))
             df_simulated = parse_sumo_outputs(config, sim_setup, OD_minus)
             y = gof_eval(df_true, df_simulated)
-            yminus=np.asarray(y)
+            yminus = np.asarray(y)
             
             OD = ODbase.copy()
 

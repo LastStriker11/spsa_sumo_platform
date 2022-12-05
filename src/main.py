@@ -26,8 +26,9 @@ if sim_setup["objective"] == "travel_times":
 # for counts
 elif sim_setup["objective"] == "counts":
     true_data = pd.read_csv(config["NETWORK"] / sim_setup["loop_data"], header=None)
-    true_data.columns = ["label", "true_counts", "true_speeds", "true_density"] # for counts
-    true_data.set_index("label", inplace=True) # for counts
+    true_data.columns = ["label", "true_counts", "true_speeds", "true_density"]
+    true_data["label"] = true_data["label"].astype(str)
+    true_data.set_index("label", inplace=True)
 
 # load demand
 input_od = pd.read_csv(config["NETWORK"] / sim_setup["prior_od"], sep="\s+", header=None, skiprows=5)
